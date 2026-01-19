@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /registrations/{userId} {
+      // Only allow users to read their own registration
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // Only allow authenticated users to create their registration once
+      allow create: if request.auth != null
+                    && request.auth.uid == userId
+                    && !exists(/databases/$(database)/documents/registrations/$(userId));
+
+      // Allow users to update their own registration
+      allow update: if request.auth != null && request.auth.uid == userId;
+
+      // Prevent deletion
+      allow delete: if false;
+    }
+  }
+}

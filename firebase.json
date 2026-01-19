@@ -1,0 +1,31 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "summit-7132c",
+          "appId": "1:228893967276:android:cc5f14386f572bb9f93009",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "summit-7132c",
+          "configurations": {
+            "android": "1:228893967276:android:cc5f14386f572bb9f93009",
+            "ios": "1:228893967276:ios:13e0ace60ddb08c3f93009",
+            "macos": "1:228893967276:ios:13e0ace60ddb08c3f93009",
+            "web": "1:228893967276:web:f4f5c2cbf253ef9ff93009",
+            "windows": "1:228893967276:web:7b5b28569b65c1dff93009"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "database": "summit",
+    "location": "asia-south1",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}

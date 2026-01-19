@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "228893967276",
+    "project_id": "summit-7132c",
+    "storage_bucket": "summit-7132c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:228893967276:android:cc5f14386f572bb9f93009",
+        "android_client_info": {
+          "package_name": "com.example.test_app_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA78oplULYhPvUXXFO-s72X6aXQH6P4sEc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
