@@ -4,8 +4,8 @@ import '../../domain/entities/assessment.dart';
 class AssessmentRepository {
   final FirebaseFirestore _firestore;
 
-  AssessmentRepository({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+  AssessmentRepository({FirebaseFirestore?  firestore})
+      : _firestore = firestore ??  FirebaseFirestore. instance;
 
   Future<Assessment?> getAssessment(String assessmentId) async {
     try {
@@ -22,8 +22,8 @@ class AssessmentRepository {
         title: data['title'] ?? 'Executive Capability Assessment',
         passage: data['passage'] ?? '',
         imageUrl: data['image_url'],
-        durationMinutes: data['duration_minutes'] ?? 90,
-        totalQuestions: data['total_questions'] ?? 30,
+        durationMinutes: data['duration_minutes'] ??  90,
+        totalQuestions: data['total_questions'] ??  30,
         createdAt: (data['created_at'] as Timestamp?)?.toDate() ?? DateTime.now(),
       );
     } catch (e) {
@@ -63,10 +63,10 @@ class AssessmentRepository {
     required DateTime startTime,
   }) async {
     try {
-      final attemptRef = await _firestore.collection('quiz_attempts').add({
+      final attemptRef = await _firestore. collection('quiz_attempts').add({
         'user_id': userId,
         'assessment_id': assessmentId,
-        'start_time': Timestamp.fromDate(startTime),
+        'start_time':  Timestamp. fromDate(startTime),
         'answers': {},
         'current_question_index': 0,
         'is_completed': false,
@@ -75,7 +75,7 @@ class AssessmentRepository {
 
       return attemptRef.id;
     } catch (e) {
-      print('Error creating attempt: $e');
+      print('Error creating attempt:  $e');
       throw Exception('Failed to create attempt');
     }
   }
@@ -87,17 +87,17 @@ class AssessmentRepository {
   }) async {
     try {
       // Convert Map<int, int> to Map<String, dynamic> for Firestore
-      final answersMap = answers.map(
-            (key, value) => MapEntry(key.toString(), value),
+      final answersMap = answers. map(
+            (key, value) => MapEntry(key. toString(), value),
       );
 
-      await _firestore.collection('quiz_attempts').doc(attemptId).update({
+      await _firestore. collection('quiz_attempts').doc(attemptId).update({
         'answers': answersMap,
         'current_question_index': currentQuestionIndex,
         'last_updated': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      print('Error saving progress: $e');
+      print('Error saving progress:  $e');
       throw Exception('Failed to save progress');
     }
   }
@@ -118,7 +118,7 @@ class AssessmentRepository {
 
       await _firestore.collection('quiz_attempts').doc(attemptId).update({
         'answers': answersMap,
-        'end_time': Timestamp.fromDate(endTime),
+        'end_time':  Timestamp.fromDate(endTime),
         'score': score,
         'total_questions': totalQuestions,
         'is_completed': true,
@@ -140,7 +140,7 @@ class AssessmentRepository {
       );
 
       return QuizAttempt(
-        id: doc.id,
+        id: doc. id,
         userId: data['user_id'],
         assessmentId: data['assessment_id'],
         answers: answersFromDb,
@@ -157,38 +157,100 @@ class AssessmentRepository {
     }
   }
 
+  /// Get all completed attempts for a user (without ordering - no index required)
   Future<List<QuizAttempt>> getUserAttempts(String userId) async {
     try {
+      // Simple query without orderBy to avoid index requirement
       final snapshot = await _firestore
           .collection('quiz_attempts')
           .where('user_id', isEqualTo: userId)
-          .where('is_completed', isEqualTo: true)
-          .orderBy('completed_at', descending: true)
+          .where('is_completed', isEqualTo:  true)
           .get();
 
-      return snapshot.docs.map((doc) {
+      final attempts = snapshot.docs. map((doc) {
         final data = doc.data();
 
         // Convert Firestore map back to Map<int, int>
-        final answers = (data['answers'] as Map<String, dynamic>).map(
+        final answers = (data['answers'] as Map<String, dynamic>?)?.map(
               (key, value) => MapEntry(int.parse(key), value as int),
-        );
+        ) ??
+            {};
 
         return QuizAttempt(
           id: doc.id,
-          userId: data['user_id'],
-          assessmentId: data['assessment_id'],
-          answers: answers,
+          userId:  data['user_id'] ?? '',
+          assessmentId: data['assessment_id'] ??  '',
+          answers:  answers,
           startTime: (data['start_time'] as Timestamp).toDate(),
           endTime: (data['end_time'] as Timestamp?)?.toDate(),
           score: data['score'] ?? 0,
-          totalQuestions: data['total_questions'] ?? 0,
+          totalQuestions:  data['total_questions'] ?? 0,
           isCompleted: data['is_completed'] ?? false,
           timeSpentSeconds: data['time_spent_seconds'] ?? 0,
         );
       }).toList();
+
+      // Sort locally by endTime or startTime (descending - newest first)
+      attempts.sort((a, b) {
+        final aTime = a.endTime ?? a.startTime;
+        final bTime = b.endTime ??  b.startTime;
+        return bTime.compareTo(aTime);
+      });
+
+      return attempts;
     } catch (e) {
       print('Error getting user attempts: $e');
+      return [];
+    }
+  }
+
+  /// Get attempt history for a specific user and assessment (without ordering - no index required)
+  Future<List<QuizAttempt>> getAttemptHistory({
+    required String userId,
+    required String assessmentId,
+  }) async {
+    try {
+      // Simple query without orderBy to avoid index requirement
+      final snapshot = await _firestore
+          .collection('quiz_attempts')
+          .where('user_id', isEqualTo: userId)
+          .where('assessment_id', isEqualTo: assessmentId)
+          .where('is_completed', isEqualTo:  true)
+          .get();
+
+      final attempts = snapshot.docs.map((doc) {
+        final data = doc.data();
+
+        // Convert Firestore map back to Map<int, int>
+        final answers = (data['answers'] as Map<String, dynamic>?)?.map(
+              (key, value) => MapEntry(int. parse(key), value as int),
+        ) ??
+            {};
+
+        return QuizAttempt(
+          id: doc.id,
+          userId: data['user_id'] ?? '',
+          assessmentId: data['assessment_id'] ?? '',
+          answers: answers,
+          startTime:  (data['start_time'] as Timestamp).toDate(),
+          endTime: (data['end_time'] as Timestamp?)?.toDate(),
+          score: data['score'] ?? 0,
+          totalQuestions: data['total_questions'] ?? 0,
+          isCompleted: data['is_completed'] ??  false,
+          timeSpentSeconds: data['time_spent_seconds'] ?? 0,
+        );
+      }).toList();
+
+      // Sort locally by endTime or startTime (descending - newest first)
+      attempts.sort((a, b) {
+        final aTime = a.endTime ??  a.startTime;
+        final bTime = b.endTime ?? b.startTime;
+        return bTime.compareTo(aTime);
+      });
+
+      return attempts;
+    } catch (e) {
+      print('Error getting attempt history: $e');
       return [];
     }
   }

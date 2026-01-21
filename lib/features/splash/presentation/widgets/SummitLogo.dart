@@ -5,7 +5,7 @@ class SummitLogo extends StatelessWidget {
 
   const SummitLogo({
     Key? key,
-    this.size = 80,
+    this.size = 60,
   }) : super(key: key);
 
   @override

@@ -22,14 +22,26 @@ class RegistrationRepositoryImpl implements RegistrationRepository {
   }) async {
     try {
       print('========================================');
-      print('DEBUG REPO: submitRegistration called');
-      print('DEBUG REPO: userId parameter: "$userId"');
-      print('DEBUG REPO: userId length: ${userId.length}');
-      print('DEBUG REPO: userId isEmpty: ${userId.isEmpty}');
+      print('REGISTRATION REPO: submitRegistration called');
+      print('REGISTRATION REPO:  userId = "$userId"');
+      print('REGISTRATION REPO:  userId length = ${userId.length}');
+      print('REGISTRATION REPO: userId isEmpty = ${userId.isEmpty}');
+      print('REGISTRATION REPO: name = "$name"');
+      print('REGISTRATION REPO: mobileNo = "$mobileNo"');
+      print('REGISTRATION REPO:  companyName = "$companyName"');
+      print('REGISTRATION REPO: designation = "$designation"');
+      print('REGISTRATION REPO: address = "$address"');
+      print('REGISTRATION REPO: gender = "$gender"');
       print('========================================');
 
+      // Validate userId
+      if (userId.isEmpty) {
+        print('REGISTRATION REPO: ✗ ERROR - userId is empty! ');
+        return Left(ServerFailure('User ID is empty.  Please sign in again.'));
+      }
+
       final registration = RegistrationModel(
-        userId: userId,
+        userId:  userId,
         name: name,
         mobileNo: mobileNo,
         companyName: companyName,
@@ -39,27 +51,36 @@ class RegistrationRepositoryImpl implements RegistrationRepository {
         createdAt: DateTime.now(),
       );
 
-      print('DEBUG REPO: RegistrationModel created');
-      print('DEBUG REPO: Model userId: "${registration.userId}"');
-      print('DEBUG REPO: Calling firestoreService.saveRegistration...');
+      print('REGISTRATION REPO:  RegistrationModel created successfully');
+      print('REGISTRATION REPO:  Calling firestoreService.saveRegistration.. .');
 
-      await firestoreService.saveRegistration(registration);
+      await firestoreService. saveRegistration(registration);
 
-      print('DEBUG REPO: Registration saved successfully!');
+      print('REGISTRATION REPO:  ✓ Registration saved successfully! ');
       return const Right(null);
-    } catch (e) {
-      print('DEBUG REPO: ERROR - $e');
+    } catch (e, stackTrace) {
+      print('REGISTRATION REPO: ✗ ERROR - $e');
+      print('REGISTRATION REPO: StackTrace - $stackTrace');
       return Left(ServerFailure(e.toString()));
     }
   }
 
   @override
-  Future<Either<Failure, RegistrationEntity?>> getRegistration(
-      String userId) async {
+  Future<Either<Failure, RegistrationEntity? >> getRegistration(String userId) async {
     try {
+      print('REGISTRATION REPO: Getting registration for userId: $userId');
+
       final registration = await firestoreService.getRegistration(userId);
+
+      if (registration != null) {
+        print('REGISTRATION REPO: ✓ Registration found');
+      } else {
+        print('REGISTRATION REPO: Registration not found');
+      }
+
       return Right(registration);
     } catch (e) {
+      print('REGISTRATION REPO:  ✗ ERROR getting registration: $e');
       return Left(ServerFailure(e.toString()));
     }
   }

@@ -47,7 +47,7 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
       StartQuiz event,
       Emitter<QuizState> emit,
       ) async {
-    if (state is! AssessmentLoaded) return;
+    if (state is!  AssessmentLoaded) return;
 
     final assessment = (state as AssessmentLoaded).assessment;
 
@@ -68,11 +68,11 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
 
       final attemptId = await assessmentRepository.createAttempt(
         userId: event.userId,
-        assessmentId: assessment.id,
-        startTime: _startTime!,
+        assessmentId: assessment. id,
+        startTime: _startTime! ,
       );
 
-      final totalSeconds = assessment.durationMinutes * 60;
+      final totalSeconds = assessment. durationMinutes * 60;
 
       emit(QuizInProgress(
         assessment: assessment,
@@ -92,7 +92,7 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
   }
 
   void _startTimer(int totalSeconds) {
-    _timer?.cancel();
+    _timer?. cancel();
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       final currentState = state;
@@ -141,9 +141,9 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
     if (state is QuizInProgress) {
       final currentState = state as QuizInProgress;
 
-      if (!currentState.isLastQuestion) {
-        emit(currentState.copyWith(
-          currentQuestionIndex: currentState.currentQuestionIndex + 1,
+      if (! currentState.isLastQuestion) {
+        emit(currentState. copyWith(
+          currentQuestionIndex:  currentState.currentQuestionIndex + 1,
         ));
       }
     }
@@ -156,9 +156,9 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
     if (state is QuizInProgress) {
       final currentState = state as QuizInProgress;
 
-      if (!currentState.isFirstQuestion) {
-        emit(currentState.copyWith(
-          currentQuestionIndex: currentState.currentQuestionIndex - 1,
+      if (! currentState.isFirstQuestion) {
+        emit(currentState. copyWith(
+          currentQuestionIndex:  currentState.currentQuestionIndex - 1,
         ));
       }
     }
@@ -173,8 +173,8 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
 
       if (event.questionNumber > 0 &&
           event.questionNumber <= currentState.totalQuestions) {
-        emit(currentState.copyWith(
-          currentQuestionIndex: event.questionNumber - 1,
+        emit(currentState. copyWith(
+          currentQuestionIndex:  event.questionNumber - 1,
         ));
       }
     }
@@ -190,7 +190,7 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
       try {
         await assessmentRepository.saveProgress(
           attemptId: currentState.attemptId,
-          answers: currentState.answers,
+          answers: currentState. answers,
           currentQuestionIndex: currentState.currentQuestionIndex,
         );
 
@@ -201,8 +201,8 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
         await Future.delayed(const Duration(seconds: 1));
         emit(currentState);
       } catch (e) {
-        emit(QuizError('Failed to save progress: $e'));
-        await Future.delayed(const Duration(seconds: 2));
+        emit(QuizError('Failed to save progress:  $e'));
+        await Future.delayed(const Duration(seconds:  2));
         emit(currentState);
       }
     }
@@ -213,11 +213,11 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
       Emitter<QuizState> emit,
       ) async {
     if (state is QuizInProgress) {
-      _timer?.cancel();
+      _timer?. cancel();
 
       final currentState = state as QuizInProgress;
       final endTime = DateTime.now();
-      final timeSpent = endTime.difference(currentState.startTime).inSeconds;
+      final timeSpent = endTime. difference(currentState. startTime).inSeconds;
 
       // Calculate score
       int correctAnswers = 0;
@@ -231,10 +231,10 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
       try {
         final attempt = await assessmentRepository.submitQuiz(
           attemptId: currentState.attemptId,
-          answers: currentState.answers,
-          endTime: endTime,
+          answers:  currentState.answers,
+          endTime:  endTime,
           score: correctAnswers,
-          totalQuestions: currentState.totalQuestions,
+          totalQuestions: currentState. totalQuestions,
           timeSpentSeconds: timeSpent,
         );
 
@@ -242,16 +242,16 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
           attempt: attempt,
           correctAnswers: correctAnswers,
           totalQuestions: currentState.totalQuestions,
-          questions: currentState.totalQuestions,
+          questions: currentState.questions, // ✅ FIXED - pass the actual questions list
         ));
       } catch (e) {
-        emit(QuizError('Failed to submit quiz: $e'));
+        emit(QuizError('Failed to submit quiz:  $e'));
       }
     }
   }
 
   void pauseTimer() {
-    _timer?.cancel();
+    _timer?. cancel();
     _lastActiveTime = DateTime.now();
   }
 
@@ -259,13 +259,14 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
     if (state is QuizInProgress && _lastActiveTime != null) {
       final currentState = state as QuizInProgress;
       final elapsed = DateTime.now().difference(_lastActiveTime!).inSeconds;
-      final newRemaining = (currentState.remainingSeconds - elapsed).clamp(0, double.infinity).toInt();
+      final newRemaining =
+      (currentState.remainingSeconds - elapsed).clamp(0, double.infinity).toInt();
 
       if (newRemaining > 0) {
         add(TimerTick(newRemaining));
         _startTimer(newRemaining);
       } else {
-        add(const SubmitQuiz(isAutoSubmit: true));
+        add(const SubmitQuiz(isAutoSubmit:  true));
       }
     }
   }

@@ -4,7 +4,7 @@ abstract class AuthState extends Equatable {
   const AuthState();
 
   @override
-  List<Object?> get props => [];
+  List<Object? > get props => [];
 }
 
 class AuthInitial extends AuthState {}
@@ -14,16 +14,18 @@ class AuthLoading extends AuthState {}
 class AuthAuthenticated extends AuthState {
   final String userId;
   final String email;
-  final String? displayName;
+  final String?  displayName;
+  final bool isNewUser; // Track if this is a new signup
 
   const AuthAuthenticated({
     required this.userId,
     required this.email,
     this.displayName,
+    this.isNewUser = false,
   });
 
   @override
-  List<Object?> get props => [userId, email, displayName];
+  List<Object?> get props => [userId, email, displayName, isNewUser];
 }
 
 class AuthUnauthenticated extends AuthState {}

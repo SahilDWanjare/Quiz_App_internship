@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_app_project/features/splash/presentation/pages/SignInScreen.dart';
+import 'package:test_app_project/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:test_app_project/features/auth/presentation/bloc/auth_event.dart';
+import 'registration_screen.dart';
 import 'home_screen_full.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -18,64 +23,94 @@ class _SplashScreenState extends State<SplashScreen> {
     _navigateToNextScreen();
   }
 
-  void _navigateToNextScreen() {
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        // Check if user is already signed in
-        final user = FirebaseAuth.instance.currentUser;
+  Future<void> _navigateToNextScreen() async {
+    // Wait for splash animation
+    await Future.delayed(const Duration(seconds: 3));
 
-        Widget nextScreen;
-        if (user != null) {
-          // User is signed in, go to home
-          nextScreen = const HomeScreen();
-        } else {
-          // User not signed in, go to sign in
-          nextScreen = const SignInScreen();
+    if (! mounted) return;
+
+    // Check if user is already signed in
+    final user = FirebaseAuth.instance. currentUser;
+
+    Widget nextScreen;
+
+    if (user != null) {
+      // User is signed in, check if registration is completed
+      final isRegistered = await _checkRegistrationStatus(user. uid);
+
+      if (isRegistered) {
+        // Registration completed, go to home
+        nextScreen = const HomeScreen();
+      } else {
+        // Registration not completed, go to registration screen
+        // First, update AuthBloc state
+        if (mounted) {
+          context.read<AuthBloc>().add(CheckAuthStatusEvent());
         }
-
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => nextScreen,
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 500),
-          ),
-        );
+        nextScreen = const RegistrationScreen();
       }
-    });
+    } else {
+      // User not signed in, go to sign in
+      nextScreen = const SignInScreen();
+    }
+
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => nextScreen,
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+          transitionDuration:  const Duration(milliseconds: 500),
+        ),
+      );
+    }
+  }
+
+  /// Check if user has completed registration in Firestore
+  Future<bool> _checkRegistrationStatus(String userId) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('registrations')
+          .doc(userId)
+          .get();
+
+      return doc.exists;
+    } catch (e) {
+      print('Error checking registration status: $e');
+      return false;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
+      body:  Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Animated Mountains Logo
             Stack(
               alignment: Alignment.center,
-              children: [
+              children:  [
                 // Left Mountain (Blue)
                 SlideInUp(
                   duration: const Duration(milliseconds: 800),
                   delay: const Duration(milliseconds: 200),
                   child: _buildMountain(
                     width: 120,
-                    height: 90,
+                    height:  90,
                     color: const Color(0xFF5B7FE8),
                     isLeft: true,
                   ),
                 ),
                 // Center Mountain (Light Blue)
                 SlideInUp(
-                  duration: const Duration(milliseconds: 800),
+                  duration: const Duration(milliseconds:  800),
                   delay: const Duration(milliseconds: 400),
                   child: _buildMountain(
                     width: 130,
@@ -86,8 +121,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
                 // Right Mountain (Green)
                 SlideInUp(
-                  duration: const Duration(milliseconds: 800),
-                  delay: const Duration(milliseconds: 600),
+                  duration:  const Duration(milliseconds: 800),
+                  delay: const Duration(milliseconds:  600),
                   child: _buildMountain(
                     width: 140,
                     height: 95,
@@ -97,13 +132,13 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
                 // Trees
                 Positioned(
-                  top: -20,
+                  top:  -20,
                   left: -30,
                   child: FadeInDown(
-                    duration: const Duration(milliseconds: 600),
+                    duration: const Duration(milliseconds:  600),
                     delay: const Duration(milliseconds: 800),
                     child: _buildTree(
-                      height: 25,
+                      height:  25,
                       color: const Color(0xFF5B7FE8),
                     ),
                   ),
@@ -113,7 +148,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   left: 5,
                   child: FadeInDown(
                     duration: const Duration(milliseconds: 600),
-                    delay: const Duration(milliseconds: 1000),
+                    delay:  const Duration(milliseconds: 1000),
                     child: _buildTree(
                       height: 30,
                       color: const Color(0xFF4A90E2),
@@ -125,8 +160,8 @@ class _SplashScreenState extends State<SplashScreen> {
                   right: -10,
                   child: FadeInDown(
                     duration: const Duration(milliseconds: 600),
-                    delay: const Duration(milliseconds: 1200),
-                    child: _buildTree(
+                    delay:  const Duration(milliseconds: 1200),
+                    child:  _buildTree(
                       height: 28,
                       color: const Color(0xFF50C878),
                     ),
@@ -138,7 +173,7 @@ class _SplashScreenState extends State<SplashScreen> {
             // Animated Summit Text
             FadeIn(
               duration: const Duration(milliseconds: 800),
-              delay: const Duration(milliseconds: 1400),
+              delay:  const Duration(milliseconds: 1400),
               child: const Text(
                 'ID Aspire',
                 style: TextStyle(
@@ -151,7 +186,7 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             const SizedBox(height: 12),
             FadeIn(
-              duration: const Duration(milliseconds: 800),
+              duration: const Duration(milliseconds:  800),
               delay: const Duration(milliseconds: 1600),
               child: const Text(
                 'Lets test your knowledge and know\nyour potential',
@@ -181,7 +216,7 @@ class _SplashScreenState extends State<SplashScreen> {
       size: Size(width, height),
       painter: MountainPainter(
         color: color,
-        isLeft: isLeft,
+        isLeft:  isLeft,
         isCenter: isCenter,
         isRight: isRight,
       ),
@@ -193,11 +228,11 @@ class _SplashScreenState extends State<SplashScreen> {
     required Color color,
   }) {
     return Column(
-      children: [
+      children:  [
         Icon(
           Icons.arrow_drop_up,
           color: color,
-          size: height * 0.6,
+          size:  height * 0.6,
         ),
         Icon(
           Icons.arrow_drop_up,
@@ -231,17 +266,17 @@ class MountainPainter extends CustomPainter {
     final path = Path();
 
     if (isLeft) {
-      path.moveTo(0, size.height);
+      path. moveTo(0, size.height);
       path.lineTo(size.width * 0.5, 0);
       path.lineTo(size.width, size.height);
     } else if (isCenter) {
       path.moveTo(0, size.height);
-      path.lineTo(size.width * 0.5, 0);
+      path.lineTo(size. width * 0.5, 0);
       path.lineTo(size.width, size.height);
     } else if (isRight) {
       path.moveTo(0, size.height);
       path.lineTo(size.width * 0.5, 0);
-      path.lineTo(size.width, size.height);
+      path.lineTo(size.width, size. height);
     }
 
     path.close();

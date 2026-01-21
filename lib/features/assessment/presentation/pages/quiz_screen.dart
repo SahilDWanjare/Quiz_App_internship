@@ -15,6 +15,8 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
+  bool _isNavigatingToResult = false; // Add this flag
+
   @override
   void initState() {
     super.initState();
@@ -23,7 +25,7 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance. removeObserver(this);
     super.dispose();
   }
 
@@ -32,11 +34,39 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
     final quizBloc = context.read<QuizBloc>();
 
     if (state == AppLifecycleState.paused) {
-      // App went to background
       quizBloc.pauseTimer();
-    } else if (state == AppLifecycleState.resumed) {
-      // App returned to foreground
+    } else if (state == AppLifecycleState. resumed) {
       quizBloc.resumeTimer();
+    }
+  }
+
+  // New method to handle navigation to result screen
+  void _navigateToResultScreen(QuizSubmitted state) async {
+    if (_isNavigatingToResult) return; // Prevent double navigation
+
+    _isNavigatingToResult = true;
+
+    // Wait for current frame to complete
+    await Future.delayed(const Duration(milliseconds: 50));
+
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => ResultScreen(
+            attempt: state.attempt,
+            correctAnswers: state.correctAnswers,
+            totalQuestions: state.totalQuestions,
+            questions: state.questions,
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+              opacity: animation,
+              child:  child,
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        ),
+      );
     }
   }
 
@@ -44,12 +74,11 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        // Disable back button during test
         final shouldPop = await _showExitDialog();
-        return shouldPop ?? false;
+        return shouldPop ??  false;
       },
-      child: Scaffold(
-        backgroundColor: Colors.grey.shade50,
+      child:  Scaffold(
+        backgroundColor: Colors.grey. shade50,
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
@@ -71,18 +100,10 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
           ),
           centerTitle: true,
         ),
-        body: BlocConsumer<QuizBloc, QuizState>(
+        body: BlocListener<QuizBloc, QuizState>(
           listener: (context, state) {
             if (state is QuizSubmitted) {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (_) => ResultScreen(
-                    attempt: state.attempt,
-                    correctAnswers: state.correctAnswers,
-                    totalQuestions: state.totalQuestions,
-                  ),
-                ),
-              );
+              _navigateToResultScreen(state);
             } else if (state is QuizSaved) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -100,21 +121,23 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
               );
             }
           },
-          builder: (context, state) {
-            if (state is QuizLoading) {
-              return const Center(
-                child: CircularProgressIndicator(
-                  color: Color(0xFF0D121F),
-                ),
-              );
-            }
+          child: BlocBuilder<QuizBloc, QuizState>(
+            builder: (context, state) {
+              if (state is QuizLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: Color(0xFF0D121F),
+                  ),
+                );
+              }
 
-            if (state is QuizInProgress) {
-              return _buildQuizContent(state);
-            }
+              if (state is QuizInProgress) {
+                return _buildQuizContent(state);
+              }
 
-            return const SizedBox();
-          },
+              return const SizedBox();
+            },
+          ),
         ),
       ),
     );
@@ -124,14 +147,14 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
     final question = state.currentQuestion;
 
     return Column(
-      children: [
+      children:  [
         // Timer
         Container(
           color: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: CircularTimer(
             remainingSeconds: state.remainingSeconds,
-            totalSeconds: state.assessment.durationMinutes * 60,
+            totalSeconds: state.assessment. durationMinutes * 60,
           ),
         ),
 
@@ -161,7 +184,7 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height:  16),
 
                 // Question Text
                 Container(
@@ -169,18 +192,18 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
+                    boxShadow:  [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
+                        color: Colors. black.withOpacity(0.05),
+                        blurRadius:  10,
+                        offset:  const Offset(0, 2),
                       ),
                     ],
                   ),
                   child: Text(
                     question.questionText,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize:  16,
                       height: 1.5,
                       color: Color(0xFF0D121F),
                       fontWeight: FontWeight.w500,
@@ -190,8 +213,8 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
                 const SizedBox(height: 24),
 
                 // Options
-                ...List.generate(
-                  question.options.length,
+                ... List.generate(
+                  question. options.length,
                       (index) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: OptionButton(
@@ -225,9 +248,9 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [
+        boxShadow:  [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black. withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -237,7 +260,7 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
         child: Row(
           children: [
             // Previous Button
-            if (!state.isFirstQuestion)
+            if (! state.isFirstQuestion)
               Expanded(
                 child: OutlinedButton(
                   onPressed: () {
@@ -261,7 +284,7 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
                 ),
               ),
 
-            if (!state.isFirstQuestion && !state.isLastQuestion)
+            if (! state.isFirstQuestion && ! state.isLastQuestion)
               const SizedBox(width: 12),
 
             // Next/Submit Button
@@ -274,17 +297,17 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
                     context.read<QuizBloc>().add(NextQuestion());
                   }
                 },
-                style: ElevatedButton.styleFrom(
+                style: ElevatedButton. styleFrom(
                   backgroundColor: const Color(0xFF0D121F),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius. circular(10),
                   ),
                   elevation: 0,
                 ),
                 child: Text(
-                  state.isLastQuestion ? 'SUBMIT' : 'NEXT',
+                  state.isLastQuestion ? 'SUBMIT' :  'NEXT',
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -300,15 +323,15 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
               onPressed: () {
                 context.read<QuizBloc>().add(SaveProgress());
               },
-              style: ElevatedButton.styleFrom(
+              style:  ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF00C853),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 14,
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                shape:  RoundedRectangleBorder(
+                  borderRadius:  BorderRadius.circular(10),
                 ),
                 elevation: 0,
               ),
@@ -331,15 +354,15 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius:  BorderRadius.circular(16),
         ),
-        title: const Text('Submit Quiz?'),
+        title: const Text('Submit Quiz? '),
         content: const Text(
-          'Are you sure you want to submit your answers? You cannot change them after submission.',
+          'Are you sure you want to submit your answers?  You cannot change them after submission.',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed:  () => Navigator.pop(context, false),
             child: const Text('CANCEL'),
           ),
           ElevatedButton(
@@ -358,16 +381,16 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
     }
   }
 
-  Future<bool?> _showExitDialog() async {
+  Future<bool? > _showExitDialog() async {
     return showDialog<bool>(
-      context: context,
+      context:  context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius:  BorderRadius.circular(16),
         ),
         title: const Text('Exit Quiz?'),
         content: const Text(
-          'Are you sure you want to exit? Your progress will be lost.',
+          'Are you sure you want to exit?  Your progress will be lost.',
         ),
         actions: [
           TextButton(
@@ -376,7 +399,7 @@ class _QuizScreenState extends State<QuizScreen> with WidgetsBindingObserver {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
+            style:  ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
             ),
             child: const Text('EXIT'),

@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/usecases/sign_in_usecase.dart'; // Import NoParams from domain
+import '../../domain/usecases/sign_in_usecase.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
@@ -40,8 +40,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           (user) => emit(
         AuthAuthenticated(
           userId: user.uid,
-          email: user.email,
+          email:  user.email ??  '',
           displayName: user.displayName,
+          isNewUser: false, // Existing user signing in
         ),
       ),
     );
@@ -63,9 +64,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           (failure) => emit(AuthError(failure.message)),
           (user) => emit(
         AuthAuthenticated(
-          userId: user.uid,
-          email: user.email,
-          displayName: user.displayName,
+          userId: user. uid,
+          email: user.email ??  '',
+          displayName: event.name, // Use the name from signup
+          isNewUser: true, // This is a new signup, registration required
         ),
       ),
     );
@@ -82,8 +84,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           (user) => emit(
         AuthAuthenticated(
           userId: user.uid,
-          email: user.email,
+          email: user.email ?? '',
           displayName: user.displayName,
+          isNewUser:  false, // We'll check registration status separately
         ),
       ),
     );
@@ -99,16 +102,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           (failure) => emit(AuthError(failure.message)),
           (user) => emit(
         AuthAuthenticated(
-          userId: user.uid,
-          email: user.email,
+          userId: user. uid,
+          email: user.email ??  '',
           displayName: user.displayName,
+          isNewUser: false, // We'll check registration status separately
         ),
       ),
     );
   }
 
-  Future<void> _onSignOut(
-      SignOutEvent event, Emitter<AuthState> emit) async {
+  Future<void> _onSignOut(SignOutEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
 
     final result = await signOutUseCase(NoParams());
@@ -129,9 +132,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if (user != null) {
           emit(
             AuthAuthenticated(
-              userId: user.uid,
-              email: user.email,
+              userId: user. uid,
+              email: user.email ??  '',
               displayName: user.displayName,
+              isNewUser: false,
             ),
           );
         } else {

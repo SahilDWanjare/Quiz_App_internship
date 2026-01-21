@@ -33,19 +33,19 @@ class QuizInProgress extends QuizState {
   const QuizInProgress({
     required this.assessment,
     required this.questions,
-    required this.currentQuestionIndex,
-    required this.answers,
+    required this. currentQuestionIndex,
+    required this. answers,
     required this.remainingSeconds,
     required this.attemptId,
-    required this.startTime,
+    required this. startTime,
   });
 
   Question get currentQuestion => questions[currentQuestionIndex];
-  int get totalQuestions => questions.length;
+  int get totalQuestions => questions. length;
   int get currentQuestionNumber => currentQuestionIndex + 1;
-  int? get selectedAnswer => answers[currentQuestionNumber];
+  int?  get selectedAnswer => answers[currentQuestionNumber];
   bool get isFirstQuestion => currentQuestionIndex == 0;
-  bool get isLastQuestion => currentQuestionIndex == questions.length - 1;
+  bool get isLastQuestion => currentQuestionIndex == questions. length - 1;
   int get answeredCount => answers.length;
 
   QuizInProgress copyWith({
@@ -60,10 +60,10 @@ class QuizInProgress extends QuizState {
     return QuizInProgress(
       assessment: assessment ?? this.assessment,
       questions: questions ?? this.questions,
-      currentQuestionIndex: currentQuestionIndex ?? this.currentQuestionIndex,
-      answers: answers ?? this.answers,
+      currentQuestionIndex:  currentQuestionIndex ??  this.currentQuestionIndex,
+      answers: answers ?? this. answers,
       remainingSeconds: remainingSeconds ?? this.remainingSeconds,
-      attemptId: attemptId ?? this.attemptId,
+      attemptId: attemptId ?? this. attemptId,
       startTime: startTime ?? this.startTime,
     );
   }
@@ -93,7 +93,7 @@ class QuizSubmitted extends QuizState {
   final QuizAttempt attempt;
   final int correctAnswers;
   final int totalQuestions;
-  final int questions;
+  final List<Question> questions; // Changed from int to List<Question>
 
   const QuizSubmitted({
     required this.questions,
@@ -105,13 +105,13 @@ class QuizSubmitted extends QuizState {
   double get percentage => (correctAnswers / totalQuestions) * 100;
 
   @override
-  List<Object?> get props => [attempt, correctAnswers, totalQuestions];
+  List<Object?> get props => [attempt, correctAnswers, totalQuestions, questions];
 }
 
 class QuizError extends QuizState {
   final String message;
 
-  const QuizError(this.message);
+  const QuizError(this. message);
 
   @override
   List<Object?> get props => [message];
