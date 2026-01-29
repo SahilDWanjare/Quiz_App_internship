@@ -1,5 +1,18 @@
 import 'package:flutter/material.dart';
 
+// --- Professional Palette ---
+class AppColors {
+  static const Color primaryNavy = Color(0xFF0D1B2A);
+  static const Color accentTeal = Color(0xFF1B9AAA);
+  static const Color lightGray = Color(0xFFF8F9FA);
+  static const Color silverBorder = Color(0xFFDDE1E6);
+  static const Color secondaryText = Color(0xFF6D7175);
+  static const Color inputText = Color(0xFF5A6169);
+  static const Color labelText = Color(0xFF8A9099);
+  static const Color gold = Color(0xFFD4AF37);
+  static const Color success = Color(0xFF4CAF50);
+}
+
 enum OptionState {
   normal,
   selected,
@@ -12,58 +25,60 @@ class OptionButton extends StatelessWidget {
   final String optionText;
   final int optionIndex;
   final bool isSelected;
-  final VoidCallback?  onTap;
+  final VoidCallback? onTap;
   final bool isReviewMode;
-  final OptionState? reviewState;
+  final OptionState?  reviewState;
 
   const OptionButton({
     Key? key,
-    required this. optionText,
+    required this.optionText,
     required this.optionIndex,
     this.isSelected = false,
-    this. onTap,
+    this.onTap,
     this.isReviewMode = false,
     this.reviewState,
-  }) : super(key:  key);
+  }) : super(key: key);
 
   String get optionLabel {
     const labels = ['A', 'B', 'C', 'D'];
-    return labels[optionIndex];
+    return optionIndex < labels.length ? labels[optionIndex] : '';
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = reviewState ?? (isSelected ? OptionState. selected : OptionState.normal);
+    final state = reviewState ?? (isSelected ? OptionState.selected : OptionState.normal);
 
     return GestureDetector(
       onTap: isReviewMode ? null : onTap,
-      child: Container(
-        padding:  const EdgeInsets. all(16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: _getBackgroundColor(state),
-          borderRadius: BorderRadius. circular(12),
-          border: Border. all(
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
             color: _getBorderColor(state),
             width: _getBorderWidth(state),
           ),
-          boxShadow: [
-            if (state == OptionState.normal)
-              BoxShadow(
-                color: Colors.black.withOpacity(0.03),
-                blurRadius:  8,
-                offset: const Offset(0, 2),
-              ),
-          ],
+          boxShadow: state != OptionState.normal
+              ?  [
+            BoxShadow(
+              color: _getBorderColor(state).withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ]
+              : null,
         ),
         child: Row(
           children: [
             // Option Label Circle
             Container(
-              width: 36,
-              height: 36,
+              width:  40,
+              height: 40,
               decoration: BoxDecoration(
                 color: _getLabelBackgroundColor(state),
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
                 child: Text(
@@ -76,16 +91,17 @@ class OptionButton extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 14),
 
             // Option Text
             Expanded(
-              child:  Text(
+              child: Text(
                 optionText,
                 style: TextStyle(
-                  fontSize:  15,
+                  fontSize: 15,
                   color: _getTextColor(state),
-                  fontWeight:  _getTextFontWeight(state),
+                  fontWeight: _getTextFontWeight(state),
+                  height: 1.4,
                 ),
               ),
             ),
@@ -101,13 +117,13 @@ class OptionButton extends StatelessWidget {
   Color _getBackgroundColor(OptionState state) {
     switch (state) {
       case OptionState.selected:
-        return const Color(0xFFD4AF37).withOpacity(0.1);
-      case OptionState. correct:
-        return const Color(0xFF00C853).withOpacity(0.1);
+        return AppColors.accentTeal.withOpacity(0.1);
+      case OptionState.correct:
+        return AppColors.success.withOpacity(0.1);
       case OptionState.wrong:
-        return Colors.red. withOpacity(0.1);
-      case OptionState. correctAnswer:
-        return const Color(0xFF00C853).withOpacity(0.1);
+        return Colors.red.withOpacity(0.1);
+      case OptionState.correctAnswer:
+        return AppColors.success.withOpacity(0.1);
       case OptionState.normal:
       default:
         return Colors.white;
@@ -117,83 +133,104 @@ class OptionButton extends StatelessWidget {
   Color _getBorderColor(OptionState state) {
     switch (state) {
       case OptionState.selected:
-        return const Color(0xFFD4AF37);
+        return AppColors.accentTeal;
       case OptionState.correct:
-        return const Color(0xFF00C853);
-      case OptionState.wrong:
-        return Colors. red;
-      case OptionState.correctAnswer:
-        return const Color(0xFF00C853);
+        return AppColors.success;
+      case OptionState. wrong:
+        return Colors.red;
+      case OptionState. correctAnswer:
+        return AppColors.success;
       case OptionState.normal:
       default:
-        return Colors.grey. shade200;
+        return AppColors.silverBorder;
     }
   }
 
   double _getBorderWidth(OptionState state) {
-    return state == OptionState. normal ? 1 : 2;
+    return state == OptionState.normal ? 1 : 2;
   }
 
   Color _getLabelBackgroundColor(OptionState state) {
     switch (state) {
       case OptionState.selected:
-        return const Color(0xFFD4AF37);
+        return AppColors.accentTeal;
       case OptionState.correct:
-        return const Color(0xFF00C853);
-      case OptionState.wrong:
-        return Colors. red;
-      case OptionState.correctAnswer:
-        return const Color(0xFF00C853);
+        return AppColors.success;
+      case OptionState. wrong:
+        return Colors.red;
+      case OptionState. correctAnswer:
+        return AppColors.success;
       case OptionState.normal:
       default:
-        return Colors.grey.shade100;
+        return AppColors.lightGray;
     }
   }
 
   Color _getLabelTextColor(OptionState state) {
-    return state == OptionState.normal ? Colors.grey. shade700 : Colors.white;
+    return state == OptionState.normal ?  AppColors.labelText : Colors.white;
   }
 
   Color _getTextColor(OptionState state) {
     switch (state) {
       case OptionState.correct:
-      case OptionState. correctAnswer:
-        return const Color(0xFF00C853);
+      case OptionState.correctAnswer:
+        return AppColors.success;
       case OptionState. wrong:
         return Colors.red;
+      case OptionState. selected:
+        return AppColors.primaryNavy;
       default:
-        return state == OptionState. selected
-            ? const Color(0xFF0D121F)
-            : Colors.grey.shade800;
+        return AppColors.inputText;
     }
   }
 
   FontWeight _getTextFontWeight(OptionState state) {
-    return state == OptionState.normal ? FontWeight.w400 : FontWeight. w600;
+    return state == OptionState.normal ?  FontWeight.w400 : FontWeight.w600;
   }
 
   Widget _buildTrailingIcon(OptionState state) {
     switch (state) {
       case OptionState.selected:
-        return const Icon(
-          Icons.check_circle,
-          color: Color(0xFFD4AF37),
-          size: 24,
+        return Container(
+          padding: const EdgeInsets.all(4),
+          decoration: const BoxDecoration(
+            color: AppColors.accentTeal,
+            shape: BoxShape. circle,
+          ),
+          child: const Icon(
+            Icons.check,
+            color: Colors.white,
+            size: 16,
+          ),
         );
       case OptionState.correct:
-      case OptionState. correctAnswer:
-        return const Icon(
-          Icons.check_circle,
-          color: Color(0xFF00C853),
-          size: 24,
+      case OptionState.correctAnswer:
+        return Container(
+          padding: const EdgeInsets.all(4),
+          decoration: const BoxDecoration(
+            color: AppColors.success,
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.check,
+            color: Colors.white,
+            size: 16,
+          ),
         );
       case OptionState.wrong:
-        return const Icon(
-          Icons.cancel,
-          color: Colors.red,
-          size: 24,
+        return Container(
+          padding: const EdgeInsets.all(4),
+          decoration: const BoxDecoration(
+            color: Colors.red,
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.close,
+            color: Colors.white,
+            size: 16,
+          ),
         );
-      case OptionState. normal:
+      case OptionState.normal:
       default:
         return const SizedBox. shrink();
     }

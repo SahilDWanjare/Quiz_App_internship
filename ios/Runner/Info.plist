@@ -1,11 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<? xml version="1.0" encoding="UTF-8"?>
+<! DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+     <key>NSLocationWhenInUseUsageDescription</key>
+        <string>ID-Aspire needs your location to provide you with the best payment options available in your region.</string>
+        <key>NSLocationAlwaysUsageDescription</key>
+        <string>ID-Aspire needs your location to provide you with the best payment options available in your region.</string>
+        <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+        <string>ID-Aspire needs your location to provide you with the best payment options available in your region.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Test App Project</string>
+	<string>ID Aspire</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -13,7 +19,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>test_app_project</string>
+	<string>ID Aspire</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -45,5 +51,54 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- Location Permissions -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>ID Aspire needs access to your location to auto-fill your address and determine the appropriate payment gateway for your region.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>ID Aspire needs access to your location to provide personalized services and auto-fill your address.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>ID Aspire needs access to your location to auto-fill your address and determine the appropriate payment gateway for your region.</string>
+
+	<!-- Camera Permission (if needed for profile photo) -->
+	<key>NSCameraUsageDescription</key>
+	<string>ID Aspire needs access to your camera to take profile photos.</string>
+
+	<!-- Photo Library Permission (if needed for profile photo) -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>ID Aspire needs access to your photo library to select profile photos.</string>
+
+	<!-- App Transport Security (for HTTP requests) -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+	</dict>
+
+	<!-- Stripe URL Schemes -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>flutterstripe</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>flutterstripe</string>
+			</array>
+		</dict>
+	</array>
+
+	<!-- Queried URL Schemes (for opening payment apps) -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+		<string>http</string>
+		<string>razorpay</string>
+	</array>
+
 </dict>
 </plist>

@@ -13,7 +13,7 @@ class LoadSubscriptionPlans extends SubscriptionEvent {}
 class SelectPlan extends SubscriptionEvent {
   final SubscriptionPlan plan;
 
-  const SelectPlan(this.plan);
+  const SelectPlan(this. plan);
 
   @override
   List<Object?> get props => [plan];
@@ -34,7 +34,7 @@ class StartPayment extends SubscriptionEvent {
   final bool isIndia;
 
   const StartPayment({
-    required this.plan,
+    required this. plan,
     required this.userId,
     required this.isIndia,
   });
@@ -46,14 +46,16 @@ class StartPayment extends SubscriptionEvent {
 class PaymentCompleted extends SubscriptionEvent {
   final String paymentId;
   final String paymentGateway;
+  final bool isIndia;
 
   const PaymentCompleted({
     required this.paymentId,
     required this.paymentGateway,
+    required this.isIndia,
   });
 
   @override
-  List<Object?> get props => [paymentId, paymentGateway];
+  List<Object?> get props => [paymentId, paymentGateway, isIndia];
 }
 
 class PaymentFailed extends SubscriptionEvent {
@@ -63,4 +65,35 @@ class PaymentFailed extends SubscriptionEvent {
 
   @override
   List<Object?> get props => [error];
+}
+
+class ActivateFreeTrial extends SubscriptionEvent {
+  final String userId;
+
+  const ActivateFreeTrial(this.userId);
+
+  @override
+  List<Object? > get props => [userId];
+}
+
+class UpdateAutoRenew extends SubscriptionEvent {
+  final String userId;
+  final bool autoRenew;
+
+  const UpdateAutoRenew({
+    required this.userId,
+    required this.autoRenew,
+  });
+
+  @override
+  List<Object?> get props => [userId, autoRenew];
+}
+
+class CancelSubscription extends SubscriptionEvent {
+  final String userId;
+
+  const CancelSubscription(this.userId);
+
+  @override
+  List<Object?> get props => [userId];
 }

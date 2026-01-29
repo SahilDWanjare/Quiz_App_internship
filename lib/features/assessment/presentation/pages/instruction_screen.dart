@@ -6,12 +6,28 @@ import '../bloc/quiz_event.dart';
 import '../bloc/quiz_state.dart';
 import 'quiz_screen.dart';
 
+// --- Professional Palette ---
+class AppColors {
+  static const Color primaryNavy = Color(0xFF0D1B2A);
+  static const Color accentTeal = Color(0xFF1B9AAA);
+  static const Color lightGray = Color(0xFFF8F9FA);
+  static const Color silverBorder = Color(0xFFDDE1E6);
+  static const Color secondaryText = Color(0xFF6D7175);
+  static const Color inputBackground = Color(0xFFF5F7FA);
+  static const Color inputBorder = Color(0xFFE8EAED);
+  static const Color inputText = Color(0xFF5A6169);
+  static const Color labelText = Color(0xFF8A9099);
+  static const Color gold = Color(0xFFD4AF37);
+  static const Color gradientStart = Color(0xFF1B9AAA);
+  static const Color gradientEnd = Color(0xFF0D1B2A);
+}
+
 class InstructionScreen extends StatefulWidget {
   final String assessmentId;
 
   const InstructionScreen({
     Key? key,
-    required this.assessmentId,
+    required this. assessmentId,
   }) : super(key: key);
 
   @override
@@ -28,30 +44,25 @@ class _InstructionScreenState extends State<InstructionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF0D121F)),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Instructions',
-          style: TextStyle(
-            color: Color(0xFF0D121F),
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
+      backgroundColor: Colors.white,
       body: BlocConsumer<QuizBloc, QuizState>(
         listener: (context, state) {
           if (state is QuizError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
+                content: Row(
+                  children: [
+                    const Icon(Icons.error_outline, color: Colors.white, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(child: Text(state.message)),
+                  ],
+                ),
+                backgroundColor: Colors.red. shade600,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                margin: const EdgeInsets.all(16),
               ),
             );
           }
@@ -60,7 +71,7 @@ class _InstructionScreenState extends State<InstructionScreen> {
           if (state is QuizLoading) {
             return const Center(
               child: CircularProgressIndicator(
-                color: Color(0xFF0D121F),
+                color: AppColors.accentTeal,
               ),
             );
           }
@@ -69,8 +80,25 @@ class _InstructionScreenState extends State<InstructionScreen> {
             return _buildContent(state.assessment);
           }
 
-          return const Center(
-            child: Text('Failed to load assessment'),
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size:  64,
+                  color: AppColors.labelText,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Failed to load assessment',
+                  style: TextStyle(
+                    color: AppColors.secondaryText,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),
@@ -80,82 +108,19 @@ class _InstructionScreenState extends State<InstructionScreen> {
   Widget _buildContent(assessment) {
     return Column(
       children: [
+        // Gradient Header
+        _buildGradientHeader(assessment),
+
+        // Content
         Expanded(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Assessment Info Card
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        assessment.title,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF0D121F),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          _buildInfoChip(
-                            Icons.quiz,
-                            '${assessment.totalQuestions} Questions',
-                          ),
-                          const SizedBox(width: 12),
-                          _buildInfoChip(
-                            Icons.access_time,
-                            '${assessment.durationMinutes} Minutes',
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Passage Section
-                const Text(
-                  'Passage',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF0D121F),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.grey.shade200),
-                  ),
-                  child: Text(
-                    assessment.passage,
-                    style: TextStyle(
-                      fontSize: 15,
-                      height: 1.6,
-                      color: Colors.grey.shade800,
-                    ),
-                  ),
-                ),
+                // Assessment Stats Card
+                _buildStatsCard(assessment),
+                const SizedBox(height: 2),
 
                 // Reference Picture
                 if (assessment.imageUrl != null) ...[
@@ -165,38 +130,54 @@ class _InstructionScreenState extends State<InstructionScreen> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0D121F),
+                      color: AppColors.primaryNavy,
                     ),
                   ),
                   const SizedBox(height: 12),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.network(
-                      assessment.imageUrl!,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Container(
-                          height: 200,
-                          color: Colors.grey.shade200,
-                          child: const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          height: 200,
-                          color: Colors.grey.shade200,
-                          child: const Center(
-                            child: Icon(Icons.image_not_supported),
-                          ),
-                        );
-                      },
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border. all(color: AppColors.silverBorder, width: 1),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Image. network(
+                        assessment.imageUrl!,
+                        width:  double.infinity,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            height: 200,
+                            color: AppColors.lightGray,
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.accentTeal,
+                              ),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            height: 200,
+                            color: AppColors.lightGray,
+                            child: const Center(
+                              child: Icon(
+                                Icons.image_not_supported_outlined,
+                                color: AppColors.labelText,
+                                size: 48,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ],
+                const SizedBox(height:  24),
+
+                // Instructions Card
+                _buildInstructionsCard(),
                 const SizedBox(height: 24),
               ],
             ),
@@ -204,69 +185,332 @@ class _InstructionScreenState extends State<InstructionScreen> {
         ),
 
         // Start Exam Button
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, -2),
+        _buildStartButton(),
+      ],
+    );
+  }
+
+  Widget _buildGradientHeader(assessment) {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient:  LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment. bottomCenter,
+          colors: [AppColors.gradientStart, AppColors.gradientEnd],
+        ),
+        borderRadius: BorderRadius. only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child:  Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 30),
+          child: Column(
+            children: [
+              // App Bar
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child:  Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color:  Colors.white. withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border. all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  const Expanded(
+                    child: Text(
+                      'Instructions',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors. white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(width: 44),
+                ],
+              ),
+              const SizedBox(height:  24),
+
+              // Assessment Icon
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.gold,
+                    width: 2,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.assignment_outlined,
+                  color: Colors.white,
+                  size: 40,
+                ),
+              ),
+              const SizedBox(height:  16),
+
+              // Assessment Title
+              Text(
+                assessment.title,
+                style: const TextStyle(
+                  fontSize:  24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors. white,
+                ),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
-          child: SafeArea(
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _startExam,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0D121F),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                ),
-                child: const Text(
-                  'START EXAM',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-            ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatsCard(assessment) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment. bottomRight,
+          colors: [
+            AppColors.accentTeal.withOpacity(0.1),
+            AppColors.primaryNavy.withOpacity(0.05),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppColors.accentTeal.withOpacity(0.3),
+          width: 1.5,
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children:  [
+          _buildStatItem(
+            Icons.quiz_outlined,
+            '${assessment.totalQuestions}',
+            'Questions',
+          ),
+          Container(
+            width: 1,
+            height: 50,
+            color: AppColors.silverBorder,
+          ),
+          _buildStatItem(
+            Icons.access_time_rounded,
+            '${assessment. durationMinutes}',
+            'Minutes',
+          ),
+          Container(
+            width: 1,
+            height: 50,
+            color: AppColors.silverBorder,
+          ),
+          _buildStatItem(
+            Icons.stars_rounded,
+            '50%',
+            'To Pass',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(IconData icon, String value, String label) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: AppColors. accentTeal.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            color: AppColors.accentTeal,
+            size: 22,
+          ),
+        ),
+        const SizedBox(height:  8),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors. primaryNavy,
+          ),
+        ),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            color:  AppColors.labelText,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildInfoChip(IconData icon, String text) {
+  Widget _buildInstructionsCard() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFD4AF37).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
+        color: AppColors.lightGray,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.silverBorder, width: 1),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 16, color: const Color(0xFFD4AF37)),
-          const SizedBox(width: 6),
-          Text(
-            text,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFFD4AF37),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.gold. withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.info_outline_rounded,
+                  color: AppColors.gold,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'Important Instructions',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primaryNavy,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildInstructionItem('Read each question carefully before answering. '),
+          _buildInstructionItem('You can navigate between questions using Previous/Next buttons.'),
+          _buildInstructionItem('Your progress is automatically saved.'),
+          _buildInstructionItem('Timer starts once you begin the exam.'),
+          _buildInstructionItem('Submit before the timer ends to record your attempt.'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInstructionItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 6),
+            width: 6,
+            height: 6,
+            decoration: const BoxDecoration(
+              color:  AppColors.accentTeal,
+              shape:  BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child:  Text(
+              text,
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppColors.inputText,
+                height: 1.4,
+              ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildStartButton() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color:  Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: GestureDetector(
+          onTap: _startExam,
+          child:  Container(
+            width: double. infinity,
+            height: 56,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [AppColors.gradientStart, AppColors.gradientEnd],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.accentTeal.withOpacity(0.4),
+                  blurRadius:  12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: const Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'START EXAM',
+                    style:  TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                      color: Colors. white,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Colors. white,
+                    size: 22,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -275,19 +519,46 @@ class _InstructionScreenState extends State<InstructionScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please sign in to start the exam')),
+        SnackBar(
+          content: const Row(
+            children: [
+              Icon(Icons.error_outline, color: Colors.white, size: 20),
+              SizedBox(width: 12),
+              Text('Please sign in to start the exam'),
+            ],
+          ),
+          backgroundColor:  Colors.red.shade600,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius:  BorderRadius.circular(10),
+          ),
+          margin: const EdgeInsets.all(16),
+        ),
       );
       return;
     }
 
-    context.read<QuizBloc>().add(StartQuiz(user.uid));
+    context. read<QuizBloc>().add(StartQuiz(user.uid));
 
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) => BlocProvider.value(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => BlocProvider.value(
           value: context.read<QuizBloc>(),
           child: const QuizScreen(),
         ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return SlideTransition(
+            position:  Tween<Offset>(
+              begin: const Offset(1, 0),
+              end:  Offset.zero,
+            ).animate(CurvedAnimation(
+              parent:  animation,
+              curve: Curves.easeOutCubic,
+            )),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 400),
       ),
     );
   }

@@ -21,8 +21,8 @@ class RazorpayService implements PaymentService {
 
   RazorpayService() {
     _razorpay = Razorpay();
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay. EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay. EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
 
@@ -32,47 +32,44 @@ class RazorpayService implements PaymentService {
     required String currency,
     required String userId,
     required String planId,
+    String? planName,
   }) async {
     // Convert amount to paise (smallest currency unit in India)
     final amountInPaise = (amount * 100).toInt();
 
     var options = {
-      'key': 'rzp_test_S3G0lKzc4lxCGp', // Replace with your Razorpay key
-      'amount': amountInPaise,
+      // 'key': 'rzp_test_S3G0lKzc4lxCGp', // Replace with your Razorpay key
+      'key' : 'rzp_live_S1jo3QM8ek8FK4',
+      'amount':  amountInPaise,
       'currency': 'INR',
-      'name': 'Summit Assessment',
-      'description': 'Subscription Plan - $planId',
+      'name': 'ID Aspire',
+      'description':  '${planName ?? planId} Subscription',
       'prefill': {
-        'contact': '',
-        'email': '',
+        'contact':  '',
+        'email':  '',
       },
       'theme': {
-        'color': '#0D121F',
+        'color':  '#1B9AAA',
+      },
+      'notes': {
+        'userId': userId,
+        'planId': planId,
       },
     };
 
     try {
       _razorpay.open(options);
-      // Wait for payment result
-      return await _waitForPayment();
+      // Payment result will be handled by callbacks
+      return '';
     } catch (e) {
       throw Exception('Razorpay payment failed: $e');
     }
   }
 
-  Future<String> _waitForPayment() async {
-    // This is a simplified implementation
-    // In production, use a Completer to handle async payment callback
-    return Future.delayed(
-      const Duration(seconds: 30),
-          () => _paymentId ?? '',
-    );
-  }
-
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     _paymentId = response.paymentId;
     print('Razorpay Payment Success: ${response.paymentId}');
-    _onSuccess?.call(response.paymentId ?? '');
+    _onSuccess?.call(response.paymentId ??  '');
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
@@ -123,25 +120,24 @@ class StripeService implements PaymentService {
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
           paymentIntentClientSecret: paymentIntent['client_secret'],
-          merchantDisplayName: 'ID Aspire Assessment',
-          // style: ThemeMode.light,
+          merchantDisplayName: 'ID Aspire',
           appearance: PaymentSheetAppearance(
             colors: PaymentSheetAppearanceColors(
-              primary: const Color(0xFF0D121F),
+              primary: const Color(0xFF1B9AAA),
             ),
           ),
         ),
       );
 
       // Step 3: Present payment sheet
-      await Stripe.instance.presentPaymentSheet();
+      await Stripe.instance. presentPaymentSheet();
 
       // Step 4: Payment successful
       print('Stripe Payment Success: ${paymentIntent['id']}');
       return paymentIntent['id'];
     } catch (e) {
       if (e is StripeException) {
-        print('Stripe Error: ${e.error.localizedMessage}');
+        print('Stripe Error: ${e.error. localizedMessage}');
         throw Exception('Stripe payment failed: ${e.error.localizedMessage}');
       } else {
         throw Exception('Stripe payment failed: $e');
@@ -157,22 +153,20 @@ class StripeService implements PaymentService {
       // Convert amount to smallest currency unit (cents for USD)
       final amountInCents = (amount * 100).toInt();
 
-      // This should be called on your backend server
-      // For demo purposes, this is a direct API call
       final response = await http.post(
         Uri.parse('https://api.stripe.com/v1/payment_intents'),
         headers: {
           'Authorization': 'Bearer $secretKey',
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type':  'application/x-www-form-urlencoded',
         },
         body: {
-          'amount': amountInCents.toString(),
-          'currency': currency.toLowerCase(),
+          'amount': amountInCents. toString(),
+          'currency': currency. toLowerCase(),
         },
       );
 
-      if (response.statusCode == 200) {
-        return json.decode(response.body);
+      if (response. statusCode == 200) {
+        return json.decode(response. body);
       } else {
         throw Exception('Failed to create payment intent');
       }
@@ -183,53 +177,39 @@ class StripeService implements PaymentService {
 }
 
 class LocationService {
-  Future<bool> isUserInIndia() async {
-    try {
-      // Method 1: Using IP-based geolocation API
-      final response = await http.get(
-        Uri.parse('http://ip-api.com/json'),
-      );
+  bool?  _cachedIsIndia;
 
-      if (response.statusCode == 200) {
+  Future<bool> isUserInIndia() async {
+    // Return cached value if available
+    if (_cachedIsIndia != null) {
+      return _cachedIsIndia!;
+    }
+
+    try {
+      final response = await http.get(
+        Uri. parse('http://ip-api.com/json'),
+      ).timeout(const Duration(seconds: 5));
+
+      if (response. statusCode == 200) {
         final data = json.decode(response.body);
         final countryCode = data['countryCode'] as String?;
         print('Detected country: $countryCode');
-        return countryCode == 'IN';
+        _cachedIsIndia = countryCode == 'IN';
+        return _cachedIsIndia!;
       }
 
-      // Fallback: assume not in India
-      return false;
+      // Fallback:  assume India
+      _cachedIsIndia = true;
+      return true;
     } catch (e) {
       print('Error detecting location: $e');
-      // Default to false (Stripe) if detection fails
-      return false;
+      // Default to India if detection fails
+      _cachedIsIndia = true;
+      return true;
     }
   }
 
-// Alternative: Using geolocator (requires GPS permission)
-// Future<bool> isUserInIndiaGPS() async {
-//   try {
-//     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-//     if (!serviceEnabled) return false;
-//
-//     LocationPermission permission = await Geolocator.checkPermission();
-//     if (permission == LocationPermission.denied) {
-//       permission = await Geolocator.requestPermission();
-//       if (permission == LocationPermission.denied) return false;
-//     }
-//
-//     Position position = await Geolocator.getCurrentPosition();
-//     List<Placemark> placemarks = await placemarkFromCoordinates(
-//       position.latitude,
-//       position.longitude,
-//     );
-//
-//     if (placemarks.isNotEmpty) {
-//       return placemarks.first.isoCountryCode == 'IN';
-//     }
-//     return false;
-//   } catch (e) {
-//     return false;
-//   }
-// }
+  void clearCache() {
+    _cachedIsIndia = null;
+  }
 }

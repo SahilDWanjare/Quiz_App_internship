@@ -17,7 +17,7 @@ class CustomTextField extends StatefulWidget {
     required this.prefixIcon,
     this.isPassword = false,
     this.keyboardType = TextInputType.text,
-    this.validator,
+    this.validator, required Color focusedBorderColor, required Color textColor,
   }) : super(key: key);
 
   @override

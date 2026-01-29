@@ -61,7 +61,7 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
       barrierDismissible: false,
       builder: (context) => const Center(
         child:  CircularProgressIndicator(
-          color: Color(0xFFD4AF37),
+          color: Color(0xFF1B9AAA),
         ),
       ),
     );
@@ -150,7 +150,7 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(
-              color: Color(0xFFD4AF37),
+              color: Color(0xFF1B9AAA),
             ),
             SizedBox(height:  16),
             Text(
@@ -195,7 +195,7 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
               const SizedBox(height:  8),
               const Icon(
                 Icons. refresh,
-                color: Color(0xFFD4AF37),
+                color: Color(0xFF1B9AAA),
               ),
             ],
           ),
@@ -244,7 +244,7 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
 
     return RefreshIndicator(
       onRefresh:  _loadAllAttempts,
-      color: const Color(0xFFD4AF37),
+      color: const Color(0xFF1B9AAA),
       child: ListView.builder(
         padding: const EdgeInsets.all(20),
         itemCount: _attempts.length,
@@ -355,13 +355,13 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
                   decoration: BoxDecoration(
                     color:  passed
                         ? const Color(0xFF4CAF50).withOpacity(0.1)
-                        :  const Color(0xFFD4AF37).withOpacity(0.1),
+                        :  const Color(0xFF1B9AAA).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border(
                       left: BorderSide(
                         color: passed
                             ? const Color(0xFF4CAF50)
-                            : const Color(0xFFD4AF37),
+                            : const Color(0xFF1B9AAA),
                         width: 3,
                       ),
                     ),
@@ -375,7 +375,7 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
                           fontWeight: FontWeight. bold,
                           color: passed
                               ? const Color(0xFF4CAF50)
-                              : const Color(0xFFD4AF37),
+                              : const Color(0xFF1B9AAA),
                         ),
                       ),
                       Text(
@@ -385,7 +385,7 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
                           fontWeight: FontWeight. bold,
                           color: passed
                               ? const Color(0xFF4CAF50)
-                              : const Color(0xFFD4AF37),
+                              : const Color(0xFF1B9AAA),
                         ),
                       ),
                     ],

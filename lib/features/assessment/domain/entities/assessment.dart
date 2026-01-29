@@ -1,5 +1,8 @@
 import 'package:equatable/equatable.dart';
 
+// UPDATED: Strictly 2 values
+enum QuestionDifficulty { easy, difficult }
+
 class Assessment extends Equatable {
   final String id;
   final String title;
@@ -37,6 +40,7 @@ class Question extends Equatable {
   final List<String> options;
   final int correctIndex;
   final int questionNumber;
+  final QuestionDifficulty difficulty;
 
   const Question({
     required this.id,
@@ -44,6 +48,7 @@ class Question extends Equatable {
     required this.options,
     required this.correctIndex,
     required this.questionNumber,
+    this.difficulty = QuestionDifficulty.easy, // Default to easy
   });
 
   @override
@@ -53,6 +58,7 @@ class Question extends Equatable {
     options,
     correctIndex,
     questionNumber,
+    difficulty,
   ];
 }
 
@@ -60,7 +66,7 @@ class QuizAttempt extends Equatable {
   final String id;
   final String userId;
   final String assessmentId;
-  final Map<int, int> answers; // questionNumber -> selectedOptionIndex
+  final Map<int, int> answers;
   final DateTime startTime;
   final DateTime? endTime;
   final int score;
