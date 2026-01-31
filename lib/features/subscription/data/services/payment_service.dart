@@ -35,22 +35,6 @@ class RazorpayService implements PaymentService {
   }) async {
     // Convert amount to paise (smallest currency unit in India)
     final amountInPaise = (amount * 100).toInt();
-
-    var options = {
-      'key': 'rzp_test_S3G0lKzc4lxCGp', // Replace with your Razorpay key
-      'amount': amountInPaise,
-      'currency': 'INR',
-      'name': 'Summit Assessment',
-      'description': 'Subscription Plan - $planId',
-      'prefill': {
-        'contact': '',
-        'email': '',
-      },
-      'theme': {
-        'color': '#0D121F',
-      },
-    };
-
     try {
       _razorpay.open(options);
       // Wait for payment result
