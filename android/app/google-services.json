@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "228893967276",
-    "project_id": "summit-7132c",
-    "storage_bucket": "summit-7132c.firebasestorage.app"
+    "project_number": "1030492585363",
+    "project_id": "quiz-app-internship-master",
+    "storage_bucket": "quiz-app-internship-master.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:228893967276:android:cc5f14386f572bb9f93009",
+        "mobilesdk_app_id": "1:1030492585363:android:a3f4c544877bf554c8fc66",
         "android_client_info": {
           "package_name": "com.example.test_app_project"
         }
@@ -15,7 +15,26 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA78oplULYhPvUXXFO-s72X6aXQH6P4sEc"
+          "current_key": "AIzaSyDNJu4jajNODPkuYES1yVzUXGGg2pXQjFs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1030492585363:android:db856bb494a0bccfc8fc66",
+        "android_client_info": {
+          "package_name": "com.idaspire.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNJu4jajNODPkuYES1yVzUXGGg2pXQjFs"
         }
       ],
       "services": {
