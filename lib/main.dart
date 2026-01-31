@@ -14,13 +14,6 @@ import 'features/assessment/presentation/bloc/quiz_bloc.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  print('🚀 Initializing Firebase...');
-  await Firebase.initializeApp();
-  print('✓ Firebase initialized successfully');
-
-  // Initialize Stripe (set your publishable key)
-  Stripe.publishableKey = 'YOUR_STRIPE_PUBLISHABLE_KEY';
-  print('✓ Stripe initialized');
 
   // Initialize Dependencies
   await initializeDependencies();
@@ -39,16 +32,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (_) => sl<AuthBloc>(),
         ),
-        BlocProvider(
-          create: (_) => sl<RegistrationBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => sl<SubscriptionBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => sl<QuizBloc>(),
-        ),
-      ],
+       
       child: MaterialApp(
         title: 'Summit',
         debugShowCheckedModeBanner: false,
