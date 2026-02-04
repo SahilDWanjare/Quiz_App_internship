@@ -50,7 +50,7 @@ class SummitLogo extends StatelessWidget {
         if (showText) ...[
           SizedBox(height: size * 0.15),
           Text(
-            'Summit',
+            'ID-Aspire',
             style: TextStyle(
               fontSize: size * 0.25,
               fontWeight: FontWeight.bold,

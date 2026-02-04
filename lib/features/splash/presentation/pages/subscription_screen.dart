@@ -7,7 +7,7 @@ import '../../../subscription/presentation/bloc/subscription_state.dart';
 import '../../../subscription/presentation/pages/subscription_plans_screen.dart';
 import '../../../subscription/domain/entity/subscription_plan.dart';
 
-// --- Professional Palette ---
+// --- Professional Palette ---/
 class AppColors {
   static const Color primaryNavy = Color(0xFF0D1B2A);
   static const Color accentTeal = Color(0xFF1B9AAA);

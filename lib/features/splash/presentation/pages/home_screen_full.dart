@@ -275,8 +275,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     const SizedBox(height: 30),
                     _buildFeatureCards(isSubscribed),
                     const SizedBox(height: 24),
-                    _buildProgressCard(),
-                    const SizedBox(height: 30),
+                    // _buildProgressCard(),
+                    // const SizedBox(height: 30),
                   ],
                 ),
               ),
@@ -343,29 +343,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
               const SizedBox(height: 24),
               _buildAppLogo(),
-              const SizedBox(height: 16),
-              Column(
-                children: [
-                  const Text(
-                    'ID Aspire',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  Text(
-                    'Empowering Future Directors',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white.withOpacity(0.7),
-                      letterSpacing: -0.3,
-                    ),
-                  ),
-                ],
-              ),
+              const SizedBox(height: 5),
+              // Column(
+              //   children: [
+              //     const Text(
+              //       'ID Aspire',
+              //       style: TextStyle(
+              //         fontSize: 28,
+              //         fontWeight: FontWeight.w600,
+              //         color: Colors.white,
+              //         letterSpacing: -0.5,
+              //       ),
+              //     ),
+              //     Text(
+              //       'Empowering Future Directors',
+              //       style: TextStyle(
+              //         fontSize: 13,
+              //         fontWeight: FontWeight.w500,
+              //         color: Colors.white.withOpacity(0.7),
+              //         letterSpacing: -0.3,
+              //       ),
+              //     ),
+              //   ],
+              // ),
             ],
           ),
         ),
@@ -374,7 +374,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildAppLogo() {
-    const double logoSize = 100;
+    const double logoSize = 150;
 
     return Container(
       width: logoSize,
@@ -404,7 +404,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           'assets/images/main_app_logo.jpg',
           width: logoSize,
           height: logoSize,
-          fit: BoxFit.cover,
+          // fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) {
             return _buildFallbackLogo(logoSize);
           },
@@ -492,16 +492,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 8),
-        Text(
-          'Your Path to Independence',
-          style: TextStyle(
-            fontSize: 14,
-            color: AppColors.secondaryText,
-            fontWeight: FontWeight.w500,
-          ),
-          textAlign: TextAlign.center,
-        ),
+
       ],
     );
   }
@@ -656,69 +647,69 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildProgressCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.silverBorder,
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          RichText(
-            text: TextSpan(
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryNavy,
-              ),
-              children: [
-                const TextSpan(text: 'OVERALL PREPARATION: '),
-                TextSpan(
-                  text: '${_progressPercentage.toInt()}%',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.accentTeal,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: LinearProgressIndicator(
-              value: _progressPercentage / 100,
-              minHeight: 12,
-              backgroundColor: AppColors.lightGray,
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accentTeal),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            _progressPercentage > 0 ? 'Keep Going!' : 'Start Your Journey!',
-            style: TextStyle(
-              fontSize: 13,
-              color: AppColors.secondaryText,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildProgressCard() {
+  //   return Container(
+  //     width: double.infinity,
+  //     padding: const EdgeInsets.all(24),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(20),
+  //       border: Border.all(
+  //         color: AppColors.silverBorder,
+  //         width: 1,
+  //       ),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black.withOpacity(0.05),
+  //           blurRadius: 10,
+  //           offset: const Offset(0, 4),
+  //         ),
+  //       ],
+  //     ),
+  //     child: Column(
+  //       children: [
+  //         RichText(
+  //           text: TextSpan(
+  //             style: const TextStyle(
+  //               fontSize: 16,
+  //               fontWeight: FontWeight.w600,
+  //               color: AppColors.primaryNavy,
+  //             ),
+  //             children: [
+  //               const TextSpan(text: 'OVERALL PREPARATION: '),
+  //               TextSpan(
+  //                 text: '${_progressPercentage.toInt()}%',
+  //                 style: const TextStyle(
+  //                   fontWeight: FontWeight.bold,
+  //                   color: AppColors.accentTeal,
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         const SizedBox(height: 16),
+  //         ClipRRect(
+  //           borderRadius: BorderRadius.circular(10),
+  //           child: LinearProgressIndicator(
+  //             value: _progressPercentage / 100,
+  //             minHeight: 12,
+  //             backgroundColor: AppColors.lightGray,
+  //             valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accentTeal),
+  //           ),
+  //         ),
+  //         const SizedBox(height: 12),
+  //         Text(
+  //           _progressPercentage > 0 ? 'Keep Going!' : 'Start Your Journey!',
+  //           style: TextStyle(
+  //             fontSize: 13,
+  //             color: AppColors.secondaryText,
+  //             fontWeight: FontWeight.w500,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildBottomNavBar() {
     return Container(
